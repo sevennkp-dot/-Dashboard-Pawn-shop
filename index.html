@@ -37,7 +37,7 @@ iframe{width:100%;height:calc(100vh - 80px);border:none;border-radius:16px;backg
   </div>
 </div>
 
-
+  
 <!-- ===== Navigation ===== -->
 <div class="navbar">
   <h1>🧠 Admin Control</h1>
@@ -58,32 +58,51 @@ iframe{width:100%;height:calc(100vh - 80px);border:none;border-radius:16px;backg
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ระบบจัดการสต็อกสินค้า (Production)</title>
 <style>
-:root{--primary:#2563eb;--success:#16a34a;--danger:#dc2626;--light:#f3f4f6;--dark:#111827}
-body{font-family:Inter,system-ui;background:#f8fafc;margin:0;padding:20px;color:#111}
+:root{--primary:#2563eb;--success:#16a34a;--danger:#dc2626;--warning:#f59e0b;--light:#f8fafc;--muted:#6b7280;--dark:#111827}
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui;background:linear-gradient(180deg,#f8fafc,#eef2ff);margin:0;padding:20px;color:#111}
 .container{max-width:1400px;margin:auto}
-h2{border-left:6px solid var(--primary);padding-left:12px;margin-bottom:12px}
-.card{background:#fff;padding:20px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-.btn{padding:8px 14px;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:13px}
-.btn-add{background:var(--success)}
-.btn-edit{background:#f59e0b}
-.btn-delete{background:var(--danger)}
-.badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+h2{display:flex;align-items:center;gap:8px;border-left:6px solid var(--primary);padding-left:12px;margin-bottom:12px}
+.card{background:#fff;padding:20px;border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.btn{padding:8px 14px;border:none;border-radius:10px;color:#fff;cursor:pointer;font-size:13px;font-weight:600;transition:.2s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.btn-add{background:linear-gradient(135deg,var(--success),#22c55e)}
+.btn-edit{background:linear-gradient(135deg,var(--warning),#fbbf24)}
+.btn-delete{background:linear-gradient(135deg,var(--danger),#ef4444)}
+.badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;display:inline-block}
 .badge-ok{background:#dcfce7;color:#166534}
 .badge-res{background:#fee2e2;color:#991b1b}
-input,textarea{padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px}
-input:focus,textarea:focus{outline:none;border-color:var(--primary)}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:13px;vertical-align:top}
-th{color:#374151;font-weight:600}
-.img-thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;background:#e5e7eb}
-.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal{background:#fff;padding:20px;border-radius:16px;width:420px;max-width:94%}
-.modal h3{margin-top:0}
-.reserve-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px}
-.image-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+input,textarea{padding:9px 10px;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;transition:.15s;width:100%}
+input::placeholder,textarea::placeholder{color:#9ca3af}
+input:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+
+table{width:100%;border-collapse:separate;border-spacing:0}
+th,td{padding:12px 10px;border-bottom:1px solid #eef2f7;text-align:left;font-size:13px;vertical-align:top}
+th{color:#374151;font-weight:600;background:#f9fafb;position:sticky;top:0;z-index:5}
+tr:hover td{background:#f8fafc}
+.td-caption{white-space:pre-line;line-height:1.5;color:#374151}
+
+.img-thumb{width:48px;height:48px;object-fit:cover;border-radius:10px;background:#e5e7eb}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal{background:#fff;padding:22px;border-radius:20px;width:420px;max-width:94%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal h3{margin-top:0;margin-bottom:10px}
+
+.reserve-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px;background:#f9fafb;padding:8px 10px;border-radius:10px}
+
+.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;margin-top:8px}
 .image-item{position:relative}
-.image-item img{width:100%;height:80px;object-fit:cover;border-radius:8px}
-.image-item button{position:absolute;top:4px;right:4px;border:none;background:rgba(0,0,0,.6);color:#fff;border-radius:999px;width:22px;height:22px;cursor:pointer}
+.image-item img{width:100%;height:80px;object-fit:cover;border-radius:10px}
+.image-item button{position:absolute;top:6px;right:6px;border:none;background:rgba(0,0,0,.6);color:#fff;border-radius:999px;width:22px;height:22px;cursor:pointer}
+
+.action-col{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.action-col .btn{width:100%}
+
+@media(max-width:900px){
+  table{font-size:12px}
+  th,td{padding:10px 6px}
+  .action-col{gap:4px}
+}
 </style>
 </head>
 <body>
@@ -103,8 +122,8 @@ th{color:#374151;font-weight:600}
   <table>
       <thead>
         <tr>
-          <th>รูป</th><th>แคปชั่น</th><th>ยี่ห้อ</th><th>เลขบิล</th><th>สาขา</th><th>ประเภท</th>
-          <th>ทุน</th><th>ราคา</th><th>สต็อก</th><th>สาขาที่จอง</th><th>พนักงานที่จอง</th><th>สถานะจอง</th><th>จัดการ</th>
+          <th>รูป</th><th>ชื่อสินค้า</th><th>แคปชั่น</th><th>ยี่ห้อ</th><th>เลขบิล</th><th>สาขา</th><th>ประเภท</th>
+          <th>ทุน</th><th>ราคา</th><th>สต็อก</th><th>พนักงานที่จอง</th><th>สถานะจอง</th><th>จัดการ</th>
         </tr>
       </thead>
       <tbody id="productTable"></tbody>
@@ -124,6 +143,47 @@ th{color:#374151;font-weight:600}
   <div style="margin-top:14px;text-align:right"><button class="btn btn-delete" id="closeModalBtn">ปิด</button></div>
 </div></div>
 
+<!-- Modal ขายหน้าร้าน (POS) -->
+<div id="posModal" class="modal-backdrop">
+  <div class="modal">
+    <h3>🛒 ขายหน้าร้าน</h3>
+    <div style="margin-bottom:8px"><b id="posProductName"></b></div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:10px">คงเหลือ <span id="posStock"></span> ชิ้น</div>
+    <input id="posQty" type="number" min="1" placeholder="จำนวนที่ขาย" />
+    <div style="margin-top:14px;display:flex;justify-content:space-between;gap:8px">
+      <button class="btn btn-delete" id="posCancel">ยกเลิก</button>
+      <button class="btn btn-add" id="posConfirm">ยืนยันขาย</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ขายออนไลน์ -->
+<div id="onlineModal" class="modal-backdrop">
+  <div class="modal">
+    <h3>🌐 ขายออนไลน์</h3>
+    <div style="margin-bottom:6px"><b id="onlineProductName"></b></div>
+    <input id="onlineCustomerName" placeholder="ชื่อลูกค้า" />
+    <input id="onlineCustomerPhone" placeholder="เบอร์โทรศัพท์" />
+    <textarea id="onlineCustomerAddress" rows="3" placeholder="ที่อยู่จัดส่ง"></textarea>
+    <input id="onlineQty" type="number" min="1" placeholder="จำนวน" />
+
+    <label style="font-size:13px;margin-top:6px">💳 วิธีชำระเงิน</label>
+    <select id="onlinePaymentType" style="width:100%;padding:9px;border-radius:10px;border:1px solid #e5e7eb">
+      <option value="transfer">โอนเงิน</option>
+      <option value="cod">เก็บเงินปลายทาง</option>
+    </select>
+
+    <div id="slipWrap" style="margin-top:8px">
+      <label style="font-size:13px">📎 แนบสลิปโอนเงิน</label>
+      <input id="onlineSlip" type="file" accept="image/*" />
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:space-between;gap:8px">
+      <button class="btn btn-delete" id="onlineCancel">ยกเลิก</button>
+      <button class="btn btn-add" id="onlineConfirm">บันทึกขายออนไลน์</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal สินค้า (ปรับ UX มืออาชีพ) -->
 <div id="productModal" class="modal-backdrop">
   <div class="modal" style="width:720px">
@@ -136,8 +196,15 @@ th{color:#374151;font-weight:600}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div style="grid-column:1/-1">
-        <label>📌 แคปชั่นสินค้า</label>
-        <textarea id="pm_name" rows="3" placeholder="เช่น รองเท้า Nike Air Force 1 สภาพใหม่"></textarea>
+        <label>📌 ชื่อสินค้า</label>
+        <input id="pm_name" placeholder="เช่น รองเท้า Nike Air Force 1" />
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label>📝 แคปชั่นสินค้า</label>
+        <textarea id="pm_brand_caption" rows="4" placeholder="เช่น รุ่นยอดนิยม
+สภาพใหม่
+รับประกันแท้"></textarea>
       </div>
 
       <div><label>🏷️ ยี่ห้อ</label><input id="pm_brand" placeholder="เช่น Nike"></div>
@@ -170,10 +237,24 @@ th{color:#374151;font-weight:600}
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-const supabase = createClient('https://dfeaeyywbaywrvnudgvu.supabase.co','sb_publishable__mJEVWqu--G3YVxgOdKAng_N985StDd');
-const $=id=>document.getElementById(id);
+const supabase = createClient('https://dfeaeyywbaywrvnudgvu.supabase.co','sb_publishable__mJEVWqu--G3YVxgOdKAng_N985StDd',{auth:{persistSession:false}});
+
+// helper แสดง error จาก supabase
+async function checkError(res, label){
+  if(res.error){
+    console.error(label, res.error);
+    alert('❌ '+label+' : '+res.error.message);
+    throw res.error;
+  }
+  return res.data;
+}
+
+const $ = id => document.getElementById(id);
 let editingProduct=null,isCreateMode=false,tempImages=[];let currentReserveProduct=null;
 let allProducts = [];
+const productTable = document.getElementById('productTable');
+const stats = document.getElementById('stats');
+const searchInput = document.getElementById('searchInput');
 
 async function loadProducts(){
   const {data}=await supabase.from('products').select('*').order('created_at',{ascending:false});
@@ -188,15 +269,17 @@ function renderProducts(list){
     const active=(p.reserved_by||[]).filter(r=>r.status!=='cancelled');
     return `<tr>
       <td>${img?`<img src="${img}" class="img-thumb">`:'-'}</td>
-      <td>${p.name||''}</td><td>${p.brand||''}</td><td>${p.inbound_bill||''}</td><td>${p.branch_address||''}</td><td>${p.category||''}</td>
+      <td>${p.name||''}</td><td class="td-caption">${p.brand_caption||''}</td><td>${p.brand||''}</td><td>${p.inbound_bill||''}</td><td>${p.branch_address||''}</td><td>${p.category||''}</td>
       <td>${p.cost||0}</td><td>${p.price||0}</td><td>${p.stock||0}</td>
-      <td>${active[0]?.branch||'-'}</td><td>${active.map(r=>`${r.staff}(${r.qty})`).join(', ')||'-'}</td>
+      <td>${active.map(r=>`${r.staff}(${r.qty})`).join(', ')||'-'}</td>
       <td>${active.length?'<span class="badge badge-res">ติดจอง</span>':'<span class="badge badge-ok">ว่าง</span>'}</td>
-      <td style="display:flex;flex-direction:column;gap:6px">
+      <td><div class="action-col">
+        <button class="btn btn-add" onclick="sellFrontShop('${p.id}')">🛒 ขายหน้าร้าน</button>
+        <button class="btn btn-add" onclick="sellOnline('${p.id}')">🌐 ขายออนไลน์</button>
         <button class="btn btn-add" onclick="openReserve('${p.id}')">แก้ไขจอง</button>
         <button class="btn btn-edit" onclick="viewCancelHistory('${p.id}')">ดูประวัติยกเลิกการจอง</button>
         <button class="btn btn-edit" onclick="openProduct('${p.id}')">แก้ไขสินค้า</button>
-      </td>
+      </div></td>
     </tr>`}).join('');
 }
 
@@ -234,7 +317,7 @@ searchInput.oninput = () => {
   renderProducts(filtered);
 };
 
-window.openProduct=async id=>{const {data}=await supabase.from('products').select('*').eq('id',id).single();editingProduct=data;isCreateMode=false;tempImages=[];productModal.style.display='flex';pm_name.value=data.name||'';pm_brand.value=data.brand||'';pm_category.value=data.category||'';pm_bill.value=data.inbound_bill||'';pm_branch.value=data.branch_address||'';pm_cost.value=data.cost||0;pm_price.value=data.price||0;pm_stock.value=data.stock||0;renderPreview(data.image_urls||[])};
+window.openProduct=async id=>{const {data}=await supabase.from('products').select('*').eq('id',id).single();editingProduct=data;isCreateMode=false;tempImages=[];productModal.style.display='flex';pm_name.value=data.name||'';pm_brand_caption.value=data.brand_caption||'';pm_brand.value=data.brand||'';pm_category.value=data.category||'';pm_bill.value=data.inbound_bill||'';pm_branch.value=data.branch_address||'';pm_cost.value=data.cost||0;pm_price.value=data.price||0;pm_stock.value=data.stock||0;renderPreview(data.image_urls||[])};
 openAddProduct.onclick=()=>{isCreateMode=true;editingProduct=null;tempImages=[];productModal.style.display='flex';['pm_name','pm_brand','pm_category','pm_bill','pm_branch','pm_cost','pm_price','pm_stock'].forEach(i=>$(i).value='');imagePreview.innerHTML=''};
 pm_image.onchange = e => {
   [...e.target.files].forEach(file => {
@@ -275,7 +358,7 @@ function renderPreview(existing = editingProduct?.image_urls || []) {
 }
 pm_save.onclick = async () => {
   // validation
-  if(!pm_name.value.trim()) return alert('กรุณากรอกแคปชั่นสินค้า');
+  if(!pm_name.value.trim()) return alert('กรุณากรอกชื่อสินค้า');
   if(+pm_price.value <= 0) return alert('ราคาขายต้องมากกว่า 0');
   if(+pm_stock.value < 0) return alert('สต็อกต้องไม่ติดลบ');
 
@@ -295,6 +378,7 @@ pm_save.onclick = async () => {
   }
 
   const payload = {
+    brand_caption: document.getElementById('pm_brand_caption')?.value || '',
     name: pm_name.value,
     brand: pm_brand.value,
     category: pm_category.value,
@@ -335,8 +419,136 @@ closeModalBtn.onclick=()=>modal.style.display='none';window.viewCancelHistory=as
   wrap.innerHTML=`<div class="modal" style="width:420px">${html}<div style="text-align:right;margin-top:10px"><button class="btn btn-delete">ปิด</button></div></div>`;
   wrap.querySelector('button').onclick=()=>wrap.remove();
   document.body.appendChild(wrap);
-};pm_cancel.onclick=()=>productModal.style.display='none';loadProducts();
+};pm_cancel.onclick=()=>productModal.style.display='none';// ====== ขายหน้าร้าน (POS) ======
+let sellingProduct = null;
+
+window.sellFrontShop = async (productId) => {
+  const product = allProducts.find(p => p.id === productId);
+  if (!product) return alert('ไม่พบสินค้า');
+  if (product.stock <= 0) return alert('สต็อกไม่พอ');
+
+  sellingProduct = product;
+  posProductName.textContent = product.name;
+  posStock.textContent = product.stock;
+  posQty.value = 1;
+  posModal.style.display = 'flex';
+};
+
+posCancel.onclick = () => {
+  posModal.style.display = 'none';
+  sellingProduct = null;
+};
+
+posConfirm.onclick = async () => {
+  if (!sellingProduct) return;
+  const qty = +posQty.value || 0;
+  if (qty <= 0 || qty > sellingProduct.stock) return alert('จำนวนไม่ถูกต้อง');
+
+  const total = qty * sellingProduct.price;
+
+  await supabase.from('sales').insert({
+    product_id: sellingProduct.id,
+    product_name: sellingProduct.name,
+    channel: 'store sales',
+    platform: 'pos',
+    qty,
+    price: sellingProduct.price,
+    total
+  });
+  await checkError(res,'บันทึกขายออนไลน์');
+
+  const upd = await supabase.from('products')
+    .update({ stock: sellingProduct.stock - qty })
+    .eq('id', sellingProduct.id);
+
+  posModal.style.display = 'none';
+  sellingProduct = null;
+  alert('✅ ขายหน้าร้านสำเร็จ');
+  loadProducts();
+};
+
+// ====== ขายออนไลน์ ======
+let onlineProduct = null;
+
+window.sellOnline = (productId) => {
+  if (!onlineModal || !onlineProductName) {
+    alert('โครงสร้าง Modal ขายออนไลน์ไม่ครบ');
+    return;
+  }
+  const product = allProducts.find(p => p.id === productId);
+  if (!product) return alert('ไม่พบสินค้า');
+  if (product.stock <= 0) return alert('สต็อกไม่พอ');
+
+  onlineProduct = product;
+  onlineProductName.textContent = product.name;
+  onlineQty.value = 1;
+  onlineCustomerName.value = '';
+  onlineCustomerPhone.value = '';
+  onlineCustomerAddress.value = '';
+  onlinePaymentType.value = 'transfer';
+  slipWrap.style.display = 'block';
+  onlineModal.style.display = 'flex';
+
+  onlinePaymentType.onchange = () => {
+    slipWrap.style.display = onlinePaymentType.value === 'transfer' ? 'block' : 'none';
+  };
+};
+
+onlineCancel.onclick = () => {
+  onlineModal.style.display = 'none';
+  onlineProduct = null;
+};
+
+onlineConfirm.onclick = async () => {
+  if (!onlineProduct) return;
+  if (!onlineCustomerName.value || !onlineCustomerPhone.value || !onlineCustomerAddress.value) {
+    return alert('กรุณากรอกข้อมูลลูกค้าให้ครบ');
+  }
+
+  const qty = +onlineQty.value || 0;
+  if (qty <= 0 || qty > onlineProduct.stock) return alert('จำนวนไม่ถูกต้อง');
+
+  const total = qty * onlineProduct.price;
+
+  let slipUrl = null;
+  if (onlinePaymentType.value === 'transfer') {
+    const file = onlineSlip.files[0];
+    if (!file) return alert('กรุณาแนบสลิปโอนเงิน');
+    const ext = file.name.split('.').pop();
+    const path = `slips/${crypto.randomUUID()}.${ext}`;
+    await supabase.storage.from('payment-slips').upload(path, file);
+    slipUrl = supabase.storage.from('payment-slips').getPublicUrl(path).data.publicUrl;
+  }
+
+    const res = await supabase.from('sell_online').insert({
+    customer_name: onlineCustomerName.value,
+    customer_phone: onlineCustomerPhone.value,
+    customer_address: onlineCustomerAddress.value,
+    product_id: onlineProduct.id,
+    product_name: onlineProduct.name,
+    price: onlineProduct.price,
+    qty,
+    total,
+    payment_type: onlinePaymentType.value,
+    slip_url: slipUrl,
+    status: 'online'
+  });
+
+  await supabase.from('products')
+    .update({ stock: onlineProduct.stock - qty })
+    .eq('id', onlineProduct.id);
+
+  onlineModal.style.display = 'none';
+  onlineProduct = null;
+  alert('✅ บันทึกขายออนไลน์แล้ว');
+  loadProducts();
+};
+
+loadProducts();
 </script>
+</body>
+</html>
+
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -391,7 +603,7 @@ loginBtn.onclick = async () => {
 </div>
 
 <div id="orderSection" class="section">
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8" />
@@ -415,7 +627,7 @@ loginBtn.onclick = async () => {
         th{background:#f8fafc;font-weight:600;color:#475569;position:sticky;top:0;z-index:10}
         
         /* Status Tags */
-        .status{padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+        .status{padding:4 px 6 px;border-radius:999px;font-size:8px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
         .pending{background:#fef3c7;color:#92400e}
         .paid{background:#dcfce7;color:#166534}
         .rejected{background:#fee2e2;color:#991b1b}
@@ -423,7 +635,7 @@ loginBtn.onclick = async () => {
         .delivered{background:#dcfce7;color:#15803d}
         .cancelled{background:#f1f5f9;color:#64748b}
 
-        .btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.15s ease;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+        .btn{padding:4 px 6px;border-radius:8px;border:none;cursor:pointer;font-size:8px;font-weight:600;transition:all 0.15s ease;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
         .btn:hover{opacity:0.85;transform:translateY(-1px)}
         .btn.primary{background:var(--primary);color:#fff}
         .btn.success{background:var(--success);color:#fff}
@@ -458,7 +670,7 @@ loginBtn.onclick = async () => {
             <p style="margin:5px 0 0;color:#64748b" id="orderCount">กำลังดึงข้อมูล...</p>
         </div>
         <div style="display:flex;gap:10px;flex:1;justify-content:flex-end">
-            <input id="searchInput" class="search" placeholder="🔍 ค้นหาชื่อ, เบอร์, หรือรหัสออเดอร์..." />
+            <input id="searchInputOrder" class="search" placeholder="🔍 ค้นหาชื่อ, เบอร์, หรือรหัสออเดอร์..." />
             <button onclick="loadOrders()" class="btn outline">🔄 รีเฟรช</button>
         </div>
     </div>
@@ -588,10 +800,10 @@ function render(list) {
                 ${o.delivery_type === 'delivery' && o.slip_url ? `
                     <button class=\"btn outline btn-slip\" data-url=\"${o.slip_url}\">🧾 ตรวจสลิป</button>
                     ${o.payment_status === 'pending' ? `
-                        <div style=\"margin-top:6px;display:flex;gap:6px\">
-                            <button class=\"btn success btn-approve\" data-id=\"${o.id}\">✔ อนุมัติ</button>
-                            <button class=\"btn danger btn-reject\" data-id=\"${o.id}\">✖ ปฏิเสธ</button>
-                        </div>
+                        <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px">
+    <button class="btn success btn-approve" data-id="${o.id}">✔ อนุมัติ</button>
+    <button class="btn danger btn-reject" data-id="${o.id}">✖ ปฏิเสธ</button>
+</div>
                     ` : ''}
                 ` : '-'}
             </td>
@@ -622,7 +834,7 @@ function render(list) {
 
 function renderActionButtons(o) {
     // ยกเลิกแล้ว
-    if (o.status === 'cancelled') return '<span style="color:gray">ยกเลิก/คืนสต็อกแล้ว</span>';
+    if (o.status === 'cancelled') return '<span style="color:gray">ยกเลิก</span>';
 
     // สำเร็จแล้ว
     if (o.status === 'delivered') return '<span class="status delivered">สำเร็จแล้ว</span>';
@@ -632,7 +844,7 @@ function renderActionButtons(o) {
         return `
             <div style="display:flex; gap:5px; flex-wrap:wrap">
                 <button class="btn primary" onclick="promptTracking('${o.id}')">🚚 ส่งของ</button>
-                <button class="btn danger" onclick="handleCancel('${o.id}')">🚫 ยกเลิก & คืนสต็อก</button>
+                <button class="btn danger" onclick="handleCancel('${o.id}')">🚫 ยกเลิก</button>
             </div>
         `;
     }
@@ -642,7 +854,7 @@ function renderActionButtons(o) {
         return `
             <div style="display:flex; gap:5px; flex-wrap:wrap">
                 <button class="btn success" onclick="updateOrder('${o.id}', {status:'delivered'})">📦 ถึงผู้รับ</button>
-                <button class="btn danger" onclick="handleCancel('${o.id}')">↩️ ตีกลับ / คืนสต็อก</button>
+                <button class="btn danger" onclick="handleCancel('${o.id}')">↩️ ตีกลับ </button>
             </div>
         `;
     }
@@ -652,7 +864,7 @@ function renderActionButtons(o) {
         return `
             <div style="display:flex; gap:5px; flex-wrap:wrap">
                 <button class="btn success" onclick="updateOrder('${o.id}', {status:'delivered'})">✅ มารับแล้ว</button>
-                <button class="btn warning" onclick="handleCancel('${o.id}')">❌ ไม่มารับ / คืนสต็อก</button>
+                <button class="btn warning" onclick="handleCancel('${o.id}')">❌ ไม่มารับ </button>
             </div>
         `;
     }
@@ -797,21 +1009,25 @@ function openSlip(url) {
     document.getElementById('slipModal').style.display = 'flex';
 }
 
-document.getElementById('searchInput').oninput = (e) => {
+const orderSearchInput = document.getElementById('searchInputOrder');
+if(orderSearchInput){
+  orderSearchInput.oninput = (e) => {
     const q = e.target.value.toLowerCase().trim();
+    if(!q){ render(ALL_ORDERS); return; }
     const filtered = ALL_ORDERS.filter(o => 
-        o.customer_name?.toLowerCase().includes(q) || 
-        o.customer_phone?.includes(q) ||
-        o.id.toLowerCase().includes(q)
+      (o.customer_name || '').toLowerCase().includes(q) || 
+      (o.customer_phone || '').includes(q) ||
+      (o.id || '').toLowerCase().includes(q)
     );
     render(filtered);
-};
+  };
+}
 
 loadOrders();
+
 </script>
 </body>
 </html>
-หกดกหดกหดหกดกหด
 
 </div>
 
@@ -842,7 +1058,3 @@ tabOrders.onclick=()=>activate('orders');
 
 </body>
 </html>
-
- 
-
-
