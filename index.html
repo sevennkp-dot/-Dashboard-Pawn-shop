@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Panel | Stock & Orders</title>
+<!-- ✅ Load utility functions -->
+<script src="./utils.js"></script>
 <style>
 :root{--primary:#2563eb;--bg:#f8fafc;--card:#fff;--text:#111827}
 *{box-sizing:border-box;font-family:Inter,system-ui}
@@ -37,20 +39,464 @@ iframe{width:100%;height:calc(100vh - 80px);border:none;border-radius:16px;backg
   </div>
 </div>
 
-  
+
 <!-- ===== Navigation ===== -->
 <div class="navbar">
   <h1>🧠 Admin Control</h1>
-  <div class="menu">
+ <div class="menu">
     <button id="tabStock" class="active">📦 จัดการสินค้า</button>
     <button id="tabOrders">🧾 ออเดอร์ทั้งหมด</button>
+    <button id="tabSales">💰 รายการขาย</button> 
     <button id="logoutBtn" class="logout">🚪 ออกจากระบบ</button>
-  </div>
+</div>
 </div>
 </div>
 
+<div id="salesSection" class="section">
+  
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>📊 รายการขาย</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<style>
+:root{
+  --radius:16px;
+  --bg:#f8fafc;--card:#ffffff;--primary:#2563eb;--primary-soft:#dbeafe;
+  --success:#16a34a;--warn:#f59e0b;--border:#e5e7eb;--text:#0f172a;--muted:#64748b
+}
+body{font-family:Inter,system-ui;background:linear-gradient(180deg,#f8fafc,#eef2f7);padding:24px;color:var(--text)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px}
+.sum-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 10px 26px rgba(15,23,42,.08)}
+.sum-card span{color:var(--muted);font-size:13px}
+.sum-card b{display:block;margin-top:6px;font-size:22px}
+.sum-card .profit{color:var(--success)}
+body{font-family:Inter,system-ui;background:linear-gradient(180deg,#f8fafc,#eef2f7);padding:24px;color:var(--text)}
+.container{max-width:1400px;margin:auto}
+
+/* Header */
+h2{margin:0 0 14px;font-size:22px;font-weight:700}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;background:#f1f5f9;padding:6px;border-radius:999px}
+.tab{padding:10px 22px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted);background:transparent;transition:.2s}
+.tab.active{background:var(--primary);color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35)}
+.tab:not(.active):hover{background:var(--primary-soft)}
+
+/* Search */
+#searchInput{padding:12px 20px;border:1px solid var(--border);border-radius:999px;min-width:300px;outline:none}
+#searchInput:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.15)}
+
+/* Card */
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 12px 30px rgba(15,23,42,.08)}
+
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1100px}
+th,td{padding:14px;border-bottom:1px solid #f1f5f9;font-size:14px;text-align:left;white-space:nowrap}
+th{background:#f8fafc;font-weight:600;position:sticky;top:0;z-index:2}
+tr:hover td{background:#f9fafb}
+
+/* Buttons */
+.btn-view{padding:6px 14px;border-radius:999px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-size:12px;font-weight:600}
+.btn-view:hover{opacity:.9}
+
+/* Badges */
+.badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500}
+.badge.success{background:#dcfce7;color:#166534}
+.badge.warn{background:#fef9c3;color:#854d0e}
+
+/* Money */
+.money{font-weight:700}
+.money.success{color:var(--success)}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal{background:#fff;border-radius:24px;max-width:860px;width:100%;padding:24px;box-shadow:0 30px 60px rgba(0,0,0,.35);animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-size:18px;font-weight:700}
+.modal-close{cursor:pointer;font-size:20px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.modal img{width:100%;max-height:520px;object-fit:contain;border-radius:16px;background:#f1f5f9}
+</style>
+
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+  <h2>📊 รายการขาย</h2>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="sum-card"><span>ยอดขายวันนี้</span><b id="sumTotal">-</b></div>
+    <div class="sum-card"><span>กำไรรวม</span><b id="sumProfit" class="profit">-</b></div>
+    <div class="sum-card"><span>จำนวนออเดอร์</span><b id="sumCount">-</b></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
+    <div class="tabs">
+      <div class="tab active" id="tabStore">🛒 ขายหน้าร้าน</div>
+      <div class="tab" id="tabOnline">🌐 ขายออนไลน์</div>
+    </div>
+    <input id="searchInput" class="search" placeholder="🔍 ค้นหา">
+  </div>
+
+  
+
+  <div class="card">
+    <table>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Supabase CDN (NO MODULE) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+// ================= App Config =================
+const CONFIG = {
+  supabaseUrl: localStorage.getItem('supabase_url') || 'https://dfeaeyywbaywrvnudgvu.supabase.co',
+  supabaseKey: localStorage.getItem('supabase_key') || 'sb_publishable__mJEVWqu--G3YVxgOdKAng_N985StDd',
+  appName: 'Admin Control Stock System',
+  version: '1.0.0'
+};
+
+// ================= Supabase =================
+if(!window.supabaseClient){
+  try {
+    window.supabaseClient = supabase.createClient(
+      CONFIG.supabaseUrl,
+      CONFIG.supabaseKey
+    );
+  } catch(err) {
+    console.error('❌ Failed to initialize Supabase:', err);
+    alert('⚠️ ระบบเริ่มต้นไม่สำเร็จ กรุณาติดต่อผู้ดูแลระบบ');
+  }
+}
+const db = window.supabaseClient;
+
+// ================= DOM =================
+const thead = document.getElementById('thead');
+const tbody = document.getElementById('tbody');
+const tabStore = document.getElementById('tabStore');
+let currentRows = [];
+const tabOnline = document.getElementById('tabOnline');
+
+// ================= Utils =================
+async function viewProduct(productId){
+  if(!productId){ alert('ไม่พบสินค้า'); return; }
+  const backdrop = document.getElementById('modalBackdrop');
+  const body = document.getElementById('modalBody');
+  body.innerHTML = 'กำลังโหลด...';
+  backdrop.style.display='flex';
+
+  const {data: p, error} = await db
+    .from('products')
+    .select('*')
+    .eq('id', productId)
+    .single();
+
+  if(error || !p){ body.innerHTML='ไม่พบข้อมูลสินค้า'; return; }
+
+  const IMAGE_BASE='https://dfeaeyywbaywrvnudgvu.supabase.co/storage/v1/object/public/product-images/';
+  // เตรียมรูปทั้งหมด
+  let images = [];
+  if (Array.isArray(p.image_urls) && p.image_urls.length) {
+    images = p.image_urls;
+  } else if (typeof p.image_urls === 'string') {
+    try {
+      const arr = JSON.parse(p.image_urls);
+      if (Array.isArray(arr)) images = arr;
+    } catch(e){}
+  }
+  if (!images.length && p.image_url) images = [p.image_url];
+  const fullImages = images.map(raw => raw.startsWith('http') ? raw : IMAGE_BASE + raw);
+
+  body.innerHTML = `
+    <div class="modal-grid">
+      <div>
+        <img id="mainProductImg" src="${fullImages[0] || 'https://via.placeholder.com/600'}" onerror="this.src='https://via.placeholder.com/600'">
+        <div style="display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:6px;max-width:100%">
+          ${fullImages.map((img,i)=>`<img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;cursor:pointer;border:2px solid ${i===0?'#2563eb':'#e5e7eb'}" onclick="document.getElementById('mainProductImg').src='${img}';this.parentNode.querySelectorAll('img').forEach(t=>t.style.border='2px solid #e5e7eb');this.style.border='2px solid #2563eb'">`).join('')}
+        </div>
+      </div>
+      <div>
+        <ul class="detail-list">
+          <li><span>ชื่อสินค้า</span><b>${p.name}</b></li>
+          <li><span>แคปชั่น</span><b>${(p.brand_caption||'-').split('-').map(s=>'- '+s.trim()).join('<br>')}</b></li>
+          <li><span>ยี่ห้อ</span><b>${p.brand||'-'}</b></li>
+          <li><span>ประเภท</span><b>${p.category||'-'}</b></li>
+          <li><span>เลขบิล</span><b>${p.inbound_bill||'-'}</b></li>
+          <li><span>สาขา</span><b>${p.branch_address||'-'}</b></li>
+          <li><span>ต้นทุน</span><b>${p.cost||0}</b></li>
+          <li><span>ราคา</span><b>${p.price||0}</b></li>
+        </ul>
+      </div>
+    </div>`;
+}
+function closeModal(){document.getElementById('modalBackdrop').style.display='none'}
+
+// ================= Summary =================
+function updateSummary(rows){
+  const start = new Date();
+  start.setHours(0,0,0,0);
+  let total = 0;
+  let profit = 0;
+  let count = 0;
+
+  rows.forEach(r=>{
+    if(!r.created_at) return;
+    const d = new Date(r.created_at);
+    if(d >= start){
+      total += Number(r.total||0);
+      profit += Number(r.profit||r.commission||0);
+      count++;
+    }
+  });
+
+  document.getElementById('sumTotal').textContent = total.toLocaleString('th-TH');
+  document.getElementById('sumProfit').textContent = profit.toLocaleString('th-TH');
+  document.getElementById('sumCount').textContent = count.toLocaleString('th-TH');
+}
+
+// ================= Render =================
+function renderRows(rows){
+  const IMAGE_BASE = 'https://dfeaeyywbaywrvnudgvu.supabase.co/storage/v1/object/public/product-images/';
+  tbody.innerHTML = rows.map(r=>{
+    let firstImage = null;
+    if (Array.isArray(r.product?.image_urls) && r.product.image_urls.length) {
+      firstImage = r.product.image_urls[0];
+    } else if (typeof r.product?.image_urls === 'string') {
+      try {
+        const arr = JSON.parse(r.product.image_urls);
+        if (Array.isArray(arr) && arr.length) firstImage = arr[0];
+      } catch(e){}
+    }
+
+    const raw = firstImage || r.product?.image_url || '';
+    const imgSrc = raw
+      ? (raw.startsWith('http') ? raw : IMAGE_BASE + raw)
+      : 'https://via.placeholder.com/48';
+
+    return `
+    <tr>
+      <td>
+        <img src="${imgSrc}" 
+             style="width:48px;height:48px;object-fit:cover;border-radius:8px;cursor:zoom-in"
+             onclick="viewProduct('${r.product_id}')"
+             onerror="this.src='https://via.placeholder.com/48'">
+      </td>
+      <td>${r.inbound_bill || '-'}</td>
+      <td>${r.product?.name || r.product_name || '-'}</td>
+      <td>${r.qty || 0}</td>
+      <td>${r.price || 0}</td>
+      <td><b>${r.total || 0}</b></td>
+      <td>${r.lost_branch || '-'}</td>
+      <td>${r.branch || '-'}</td>
+      <td>${r.staff || '-'}</td>
+      <td>💰 ${r.commission ? r.commission.toFixed(2) : '0.00'}</td>
+      <td>${new Date(r.created_at).toLocaleString('th-TH')}</td>
+      <td><button class="btn-view" onclick="viewProduct('${r.product_id}')">ดู</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ================= Search =================
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+  renderRows(currentRows.filter(r =>
+    Object.values(r).some(v => String(v||'').toLowerCase().includes(q))
+  ));
+};
+
+// ================= Loaders =================
+async function loadStoreSales(){
+  setActiveTab(tabStore);
+
+  thead.innerHTML = `
+    <tr>
+      <th>รูป</th>
+      <th>เลขบิล (inbound)</th>
+      <th>สินค้า</th>
+      <th>จำนวน</th>
+      <th>ราคา</th>
+      <th>รวม</th>
+      <th>สาขาที่หลุด</th>
+      <th>สาขาที่ขาย</th>
+      <th>พนักงาน</th>
+      <th>ค่าคอม</th>
+      <th>วันที่</th>
+      <th>ดูสินค้า</th>
+    </tr>`;
+
+  const {data: sales, error} = await db
+    .from('sales')
+    .select('id, product_id, product_name, qty, price, total, branch, staff, created_at, commission')
+    .order('created_at', { ascending: false });
+
+  if(error){ console.error(error); alert('โหลดขายหน้าร้านไม่สำเร็จ'); return; }
+
+  const productIds = [...new Set((sales||[]).map(s=>s.product_id).filter(Boolean))];
+  let productMap = {};
+
+  if(productIds.length){
+    const {data: products} = await db
+      .from('products')
+      .select('id, name, image_url, image_urls, branch_address, cost, inbound_bill')
+      .in('id', productIds);
+    (products||[]).forEach(p=> productMap[p.id] = p);
+  }
+
+  currentRows = (sales||[]).map(s => ({
+    ...s,
+    inbound_bill: productMap[s.product_id]?.inbound_bill || '-',
+    product: productMap[s.product_id] || {},
+    lost_branch: productMap[s.product_id]?.branch_address || '-',
+    commission: Math.max(((s.price || 0) - (productMap[s.product_id]?.cost||0)) * 0.05, 0)
+  }));
+
+  renderRows(currentRows);
+  updateSummary(currentRows);
+}
+
+// ================= Online =================
+async function loadOnlineSales(){
+  setActiveTab(tabOnline);
+
+  thead.innerHTML = `
+    <tr>
+      <th>สินค้า</th>
+      <th>ลูกค้า</th>
+      <th>เบอร์</th>
+      <th>ที่อยู่</th>
+      <th>จำนวน</th>
+      <th>ต้นทุน</th>
+      <th>ราคาขาย</th>
+      <th>กำไร</th>
+      <th>รวม</th>
+      <th>ชำระเงิน</th>
+      <th>สถานะ</th>
+      <th>สาขาสินค้า</th>
+      <th>สาขาที่ขาย</th>
+      <th>พนักงาน</th>
+      <th>วันที่</th>
+      <th>ค่าคอมพนักงาน</th>
+      <th>สลิป</th>
+    </tr>`;
+
+  const { data, error } = await db
+    .from('sell_online')
+    .select(`*, products:product_id ( branch_address, cost, image_url, image_urls )`)
+    .order('created_at', { ascending: false });
+
+  if(error){ alert('โหลดขายออนไลน์ไม่สำเร็จ'); console.error(error); return; }
+
+  currentRows = (data||[]).map(r => {
+    const cost = r.products?.cost || 0;
+    const qty = r.qty || 0;
+    const profit = ((r.price || 0) - cost) * qty;
+    return {
+      ...r,
+      profit,
+      product: r.products || {}
+    };
+  });
+
+  renderOnlineRows(currentRows);
+  updateSummary(currentRows);
+}
+
+function renderOnlineRows(rows){
+  const IMAGE_BASE = 'https://dfeaeyywbaywrvnudgvu.supabase.co/storage/v1/object/public/product-images/';
+  tbody.innerHTML = rows.map(r=>{
+    let img = r.product?.image_url || '';
+    if(Array.isArray(r.product?.image_urls) && r.product.image_urls.length){
+      img = r.product.image_urls[0];
+    }
+    const imgSrc = img ? (img.startsWith('http') ? img : IMAGE_BASE + img) : 'https://via.placeholder.com/48';
+
+    return `
+      <tr>
+        <td>${r.product_name||'-'}</td>
+        <td>${r.customer_name||'-'}</td>
+        <td>${r.customer_phone||'-'}</td>
+        <td>${r.customer_address||'-'}</td>
+        <td>${r.qty||0}</td>
+        <td>${((r.product?.cost||0)*(r.qty||0)).toLocaleString('th-TH')}</td>
+        <td>${(r.price||0).toLocaleString('th-TH')}</td>
+        <td><b style="color:#16a34a">${(r.profit||0).toLocaleString('th-TH')}</b></td>
+        <td><b>${(r.total||0).toLocaleString('th-TH')}</b></td>
+        <td>${r.payment_type||'-'}</td>
+        <td>${r.status||'-'}</td>
+        <td>${r.product?.branch_address||'-'}</td>
+        <td>${r.branch||'-'}</td>
+        <td>${r.staff_name||'-'}</td>
+        <td>${r.created_at ? new Date(r.created_at).toLocaleString('th-TH'):'-'}</td>
+        <td>💰 ${(r.commission||0).toLocaleString('th-TH')}</td>
+        <td>${r.slip_url ? `<button class="btn-view" onclick="window.open('${r.slip_url}','_blank')">ดูสลิป</button>` : '-'}</td>
+      </tr>`;
+  }).join('');
+}
+
+function setActiveTab(active){
+  [tabStore, tabOnline].forEach(t=>t.classList.remove('active'));
+  active.classList.add('active');
+}
+
+// ================= Events =================
+tabStore.onclick = loadStoreSales;
+tabOnline.onclick = loadOnlineSales;
+
+
+// ================= Init =================
+loadStoreSales();
+</script>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">📦 รายละเอียดสินค้า</div>
+      <div class="modal-close" onclick="closeModal()">✖</div>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+</body>
+
+
+
+</html>
+
+
+
+
+
+
+
+
+  
+  
+</div>
+
+
+
+
+
+
+
+
+  
 <!-- ===== Sections ===== -->
-<div id="stockSection" class="section active">
+<div id="stockSection" class="section active">  
   <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -82,7 +528,11 @@ th{color:#374151;font-weight:600;background:#f9fafb;position:sticky;top:0;z-inde
 tr:hover td{background:#f8fafc}
 .td-caption{white-space:pre-line;line-height:1.5;color:#374151}
 
-.img-thumb{width:48px;height:48px;object-fit:cover;border-radius:10px;background:#e5e7eb}
+.img-thumb{width:48px;height:48px;object-fit:cover;border-radius:10px;background:#e5e7eb;cursor:pointer}
+
+/* image viewer */
+.image-viewer{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:2000}
+.image-viewer img{max-width:90%;max-height:90%;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 
 .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:1000}
 .modal{background:#fff;padding:22px;border-radius:20px;width:420px;max-width:94%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
@@ -127,6 +577,10 @@ tr:hover td{background:#f8fafc}
         </tr>
       </thead>
       <tbody id="productTable"></tbody>
+
+<div id="imageViewer" class="image-viewer" onclick="this.style.display='none'">
+  <img id="imageViewerImg" />
+</div>
     </table>
   </div>
 </div>
@@ -162,6 +616,10 @@ tr:hover td{background:#f8fafc}
   <div class="modal">
     <h3>🌐 ขายออนไลน์</h3>
     <div style="margin-bottom:6px"><b id="onlineProductName"></b></div>
+
+    <input id="onlineBranch" placeholder="🏢 สาขาที่ขาย" />
+    <input id="onlineStaff" placeholder="👤 ชื่อพนักงาน" />
+
     <input id="onlineCustomerName" placeholder="ชื่อลูกค้า" />
     <input id="onlineCustomerPhone" placeholder="เบอร์โทรศัพท์" />
     <textarea id="onlineCustomerAddress" rows="3" placeholder="ที่อยู่จัดส่ง"></textarea>
@@ -250,6 +708,43 @@ async function checkError(res, label){
 }
 
 const $ = id => document.getElementById(id);
+
+// ===== Image Viewer (GLOBAL) =====
+window.viewImage = (url) => {
+  const viewer = document.getElementById('imageViewer');
+  const img = document.getElementById('imageViewerImg');
+  img.src = url;
+  viewer.style.display = 'flex';
+};
+
+// ===== Download Images (ใช้งานได้จริงทุกเบราว์เซอร์) =====
+window.downloadImages = async (productId) => {
+  const product = allProducts.find(p => p.id === productId);
+  if (!product || !product.image_urls || !product.image_urls.length) {
+    return alert('ไม่มีรูปสำหรับสินค้านี้');
+  }
+
+  for (let i = 0; i < product.image_urls.length; i++) {
+    const url = product.image_urls[i];
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `product_${productId}_${i + 1}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error('download image error', e);
+      alert('ดาวน์โหลดรูปไม่สำเร็จ');
+    }
+  }
+};
 let editingProduct=null,isCreateMode=false,tempImages=[];let currentReserveProduct=null;
 let allProducts = [];
 const productTable = document.getElementById('productTable');
@@ -265,10 +760,16 @@ async function loadProducts(){
 function renderProducts(list){
   renderStats(list);
   productTable.innerHTML=list.map(p=>{
-    const img=p.image_urls?.[0];
+    const imgs=p.image_urls||[];
+    const img=imgs[0];
     const active=(p.reserved_by||[]).filter(r=>r.status!=='cancelled');
     return `<tr>
-      <td>${img?`<img src="${img}" class="img-thumb">`:'-'}</td>
+      <td>
+        ${img?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+          <img src="${img}" class="img-thumb" onclick="viewImage('${img}')">
+          <button class="btn btn-edit" style="padding:4px 8px" onclick="downloadImages('${p.id}')">⬇ ดาวน์โหลด</button>
+        </div>`:'-'}
+      </td>
       <td>${p.name||''}</td><td class="td-caption">${p.brand_caption||''}</td><td>${p.brand||''}</td><td>${p.inbound_bill||''}</td><td>${p.branch_address||''}</td><td>${p.category||''}</td>
       <td>${p.cost||0}</td><td>${p.price||0}</td><td>${p.stock||0}</td>
       <td>${active.map(r=>`${r.staff}(${r.qty})`).join(', ')||'-'}</td>
@@ -366,7 +867,6 @@ pm_save.onclick = async () => {
     ? [...editingProduct.image_urls]
     : [];
 
-  // upload เฉพาะรูปใหม่
   for (const file of tempImages) {
     const ext = file.name.split('.').pop();
     const path = `products/${crypto.randomUUID()}.${ext}`;
@@ -400,8 +900,8 @@ pm_save.onclick = async () => {
 
   tempImages = [];
   productModal.style.display = 'none';
-  loadProducts();
 };
+  
 
 window.openReserve=async id=>{const {data}=await supabase.from('products').select('*').eq('id',id).single();currentReserveProduct=data;modal.style.display='flex';renderReserve()};
 function renderReserve(){reserveList.innerHTML='';(currentReserveProduct.reserved_by||[]).forEach((r,i)=>{reserveList.innerHTML+=`<div class="reserve-row"><span>${r.staff} (${r.qty}) - ${r.status}</span>${r.status!=='cancelled'?`<button class="btn btn-delete" onclick="cancelReserve(${i})">ยกเลิก</button>`:''}</div>`})}
@@ -516,7 +1016,12 @@ onlineConfirm.onclick = async () => {
     if (!file) return alert('กรุณาแนบสลิปโอนเงิน');
     const ext = file.name.split('.').pop();
     const path = `slips/${crypto.randomUUID()}.${ext}`;
-    await supabase.storage.from('payment-slips').upload(path, file);
+    const uploadRes = await supabase.storage.from('payment-slips').upload(path, file);
+    if (uploadRes.error) {
+      console.error('upload slip error', uploadRes.error);
+      alert('❌ อัปโหลดสลิปไม่สำเร็จ: ' + uploadRes.error.message);
+      return;
+    }
     slipUrl = supabase.storage.from('payment-slips').getPublicUrl(path).data.publicUrl;
   }
 
@@ -526,6 +1031,8 @@ onlineConfirm.onclick = async () => {
     customer_address: onlineCustomerAddress.value,
     product_id: onlineProduct.id,
     product_name: onlineProduct.name,
+    branch: onlineBranch.value,
+    staff_name: onlineStaff.value,
     price: onlineProduct.price,
     qty,
     total,
@@ -549,7 +1056,9 @@ loadProducts();
 </body>
 </html>
 
-
+กหดหกดหกด
+กดกหดหกด
+  กดหกด
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabaseAuth = createClient('https://dfeaeyywbaywrvnudgvu.supabase.co','sb_publishable__mJEVWqu--G3YVxgOdKAng_N985StDd');
@@ -572,24 +1081,57 @@ supabaseAuth.auth.onAuthStateChange((_event, session)=>{
 const logoutBtn = document.getElementById('logoutBtn');
 if(logoutBtn){
   logoutBtn.onclick = async ()=>{
-    await supabaseAuth.auth.signOut();
-    location.reload();
+    try {
+      await supabaseAuth.auth.signOut();
+      localStorage.clear();
+      location.reload();
+    } catch(err) {
+      console.error('❌ Logout error:', err);
+      alert('❌ ออกจากระบบล้มเหลว');
+    }
   };
 }
 
 loginBtn.onclick = async () => {
-  loginErr.style.display='none';
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPass').value;
-  if(!email || !password){
-    loginErr.innerText='กรุณากรอก Email และ Password';
+  try {
+    loginErr.style.display='none';
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    
+    // ✅ Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!email || !emailRegex.test(email)){
+      loginErr.innerText='❌ กรุณากรอก Email ที่ถูกต้อง';
+      loginErr.style.display='block';
+      return;
+    }
+    
+    // ✅ Password validation
+    if(!password || password.length < 6){
+      loginErr.innerText='❌ Password ต้องมี 6 ตัวอักษรขึ้นไป';
+      loginErr.style.display='block';
+      return;
+    }
+    
+    // ✅ Login with rate limiting
+    loginBtn.disabled = true;
+    loginBtn.textContent = '⏳ กำลังเข้าสู่ระบบ...';
+    
+    const { error } = await supabaseAuth.auth.signInWithPassword({ email, password });
+    if(error){
+      loginErr.innerText = '❌ ' + (error.message || 'เข้าสู่ระบบล้มเหลว');
+      loginErr.style.display='block';
+      console.error('Login error:', error);
+    } else {
+      alert('✅ เข้าสู่ระบบสำเร็จแล้ว');
+    }
+  } catch(err) {
+    console.error('❌ Login exception:', err);
+    loginErr.innerText='❌ เกิดข้อผิดพลาด: ' + (err?.message || 'Unknown');
     loginErr.style.display='block';
-    return;
-  }
-  const { error } = await supabaseAuth.auth.signInWithPassword({ email, password });
-  if(error){
-    loginErr.innerText = error.message;
-    loginErr.style.display='block';
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'เข้าสู่ระบบ';
   }
 };
 </script>
@@ -1034,27 +1576,76 @@ loadOrders();
 <script>
 const tabStock = document.getElementById('tabStock');
 const tabOrders = document.getElementById('tabOrders');
+const tabSales  = document.getElementById('tabSales');
+
 const stockSection = document.getElementById('stockSection');
 const orderSection = document.getElementById('orderSection');
+const salesSection = document.getElementById('salesSection');
 
 function activate(tab){
-  tabStock.classList.remove('active');
-  tabOrders.classList.remove('active');
-  stockSection.classList.remove('active');
-  orderSection.classList.remove('active');
+  // ซ่อนทุก section
+  [stockSection, orderSection, salesSection].forEach(s =>
+    s && s.classList.remove('active')
+  );
 
-  if(tab==='stock'){
+  // ปิด active ทุกปุ่ม
+  [tabStock, tabOrders, tabSales].forEach(b =>
+    b && b.classList.remove('active')
+  );
+
+  // เปิดตามปุ่มที่กด
+  if(tab === 'stock'){
     tabStock.classList.add('active');
     stockSection.classList.add('active');
-  }else{
+  }
+
+  if(tab === 'orders'){
     tabOrders.classList.add('active');
     orderSection.classList.add('active');
   }
+
+  if(tab === 'sales'){
+    tabSales.classList.add('active');
+    salesSection.classList.add('active');
+  }
 }
 
-tabStock.onclick=()=>activate('stock');
-tabOrders.onclick=()=>activate('orders');
+
+// ผูกปุ่มเมนู
+tabStock.onclick  = () => activate('stock');
+tabOrders.onclick = () => activate('orders');
+tabSales.onclick  = () => activate('sales');
 </script>
 
 </body>
+</html>
+
+<div id="salesSection" class="section">
+<div class="container">
+  <h2>📊 รายการขาย</h2>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="sum-card"><span>ยอดขายวันนี้</span><b id="sumTotal">-</b></div>
+    <div class="sum-card"><span>กำไรรวม</span><b id="sumProfit" class="profit">-</b></div>
+    <div class="sum-card"><span>จำนวนออเดอร์</span><b id="sumCount">-</b></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
+    <div class="tabs">
+      <div class="tab active" id="tabStore">🛒 ขายหน้าร้าน</div>
+      <div class="tab" id="tabOnline">🌐 ขายออนไลน์</div>
+    </div>
+    <input id="searchInput" class="search" placeholder="🔍 ค้นหา">
+  </div>
+
+
+  <div class="card">
+    <table>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
 </html>
