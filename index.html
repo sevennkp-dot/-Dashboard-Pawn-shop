@@ -471,6 +471,30 @@ tr:hover td {
   background: #f9fafb;
   border: 1px solid var(--border);
 }
+
+/* Sales Section Table */
+#salesSection table {
+  font-size: 11px;
+}
+
+#salesSection th,
+#salesSection td {
+  padding: 9px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+#salesSection th {
+  font-size: 10px;
+  padding: 8px 5px;
+}
+
+#salesSection .btn-view {
+  padding: 5px 10px;
+  font-size: 9px;
+}
 </style>
 </style>
 
@@ -1152,20 +1176,25 @@ tr:hover td {
 .action-col {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   align-items: stretch;
+  min-width: 0;
 }
 
 .action-col .btn {
   width: 100%;
-  padding: 8px;
-  font-size: 11px;
+  padding: 6px 4px;
+  font-size: 10px;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 900px) {
-  table { font-size: 12px; }
-  th, td { padding: 12px 10px; }
-  .action-col { gap: 4px; }
+  table { font-size: 11px; }
+  th, td { padding: 8px 6px; }
+  .action-col { gap: 2px; }
+  .action-col .btn { padding: 4px 3px; font-size: 9px; }
 }
 </style>
 </style>
@@ -1965,15 +1994,18 @@ loginBtn.onclick = async () => {
           width: 100%;
           border-collapse: separate;
           border-spacing: 0;
-          font-size: 13px;
-          min-width: 1200px;
+          font-size: 11px;
         }
 
         th, td {
-          padding: 16px 14px;
+          padding: 10px 6px;
           border-bottom: 1px solid #f3f4f6;
           text-align: left;
           vertical-align: top;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100px;
         }
 
         th {
@@ -1984,13 +2016,29 @@ loginBtn.onclick = async () => {
           top: 0;
           z-index: 10;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
-          font-size: 12px;
+          letter-spacing: 0.3px;
+          font-size: 10px;
+          padding: 8px 6px;
         }
 
         tr:hover td {
           background: #f9fafb;
         }
+
+        /* Column width constraints */
+        td:nth-child(1), th:nth-child(1) { max-width:80px; }
+        td:nth-child(2), th:nth-child(2) { max-width:85px; }
+        td:nth-child(3), th:nth-child(3) { max-width:90px; }
+        td:nth-child(4), th:nth-child(4) { max-width:95px; }
+        td:nth-child(5), th:nth-child(5) { max-width:65px; }
+        td:nth-child(6), th:nth-child(6) { max-width:60px; }
+        td:nth-child(7), th:nth-child(7) { max-width:65px; }
+        td:nth-child(8), th:nth-child(8) { max-width:70px; }
+        td:nth-child(9), th:nth-child(9) { max-width:70px; }
+        td:nth-child(10), th:nth-child(10) { max-width:65px; }
+        td:nth-child(11), th:nth-child(11) { max-width:80px; }
+        td:nth-child(12), th:nth-child(12) { max-width:95px; }
+        td:nth-child(13), th:nth-child(13) { max-width:70px; }
         
         /* Status Tags */
         .status {
@@ -2168,19 +2216,19 @@ loginBtn.onclick = async () => {
         <table>
             <thead>
                 <tr>
-                  <th>เลขบิล (inbound_bill)</th>
-                  <th>ออเดอร์ (Order ID)</th>
-                  <th>ลูกค้า</th>
-                  <th>ที่อยู่</th>
-                  <th>เบอร์</th>
-                  <th>ยอด</th>
-                  <th>ชำระเงิน</th>
-                  <th>ชำระเงิน / สลิป</th>
-                  <th>สถานะจัดส่ง</th>
-                  <th>เลขพัสดุ</th>
-                  <th>จัดการจัดส่ง</th>
-                  <th>วันที่สร้างออเดอร์</th>
-                  <th>สินค้า</th>
+                  <th style="max-width:80px">เลขบิล</th>
+                  <th style="max-width:85px">ออเดอร์</th>
+                  <th style="max-width:90px">ลูกค้า</th>
+                  <th style="max-width:95px">ที่อยู่</th>
+                  <th style="max-width:65px">เบอร์</th>
+                  <th style="max-width:60px">ยอด</th>
+                  <th style="max-width:65px">สถานะ</th>
+                  <th style="max-width:70px">สลิป</th>
+                  <th style="max-width:70px">ส่ง</th>
+                  <th style="max-width:65px">พัสดุ</th>
+                  <th style="max-width:80px">จัดการ</th>
+                  <th style="max-width:95px">วันที่</th>
+                  <th style="max-width:70px">รายละเอียด</th>
                 </tr>
             </thead>
             <tbody id="orderTable">
