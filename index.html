@@ -688,9 +688,15 @@ function renderRows(rows){
 // ================= Search =================
 jedSearchSalesInput.oninput = () => {
   const q = jedSearchSalesInput.value.toLowerCase();
-  renderRows(currentRows.filter(r =>
+  const filtered = currentRows.filter(r =>
     Object.values(r).some(v => String(v||'').toLowerCase().includes(q))
-  ));
+  );
+  
+  if (tabOnline.classList.contains('active')) {
+    renderOnlineRows(filtered);
+  } else {
+    renderRows(filtered);
+  }
 };
 
 // ================= Loaders =================
@@ -750,6 +756,7 @@ async function loadOnlineSales(){
   thead.innerHTML = `
     <tr>
       <th>รูป</th>
+      <th>เลขบิล</th>
       <th>สินค้า</th>
       <th>ลูกค้า</th>
       <th>เบอร์</th>
@@ -771,7 +778,7 @@ async function loadOnlineSales(){
 
   const { data, error } = await db
     .from('sell_online')
-    .select(`*, products:product_id ( branch_address, cost, image_url, image_urls )`)
+    .select(`*, products:product_id ( branch_address, cost, image_url, image_urls, inbound_bill )`)
     .order('created_at', { ascending: false });
 
   if(error){ alert('โหลดขายออนไลน์ไม่สำเร็จ'); console.error(error); return; }
@@ -808,6 +815,7 @@ function renderOnlineRows(rows){
                onclick="viewProduct('${r.product_id}')"
                onerror="this.src='https://via.placeholder.com/48'">
         </td>
+        <td>${r.product?.inbound_bill || '-'}</td>
         <td>${r.product_name||'-'}</td>
         <td>${r.customer_name||'-'}</td>
         <td>${r.customer_phone||'-'}</td>
@@ -1213,7 +1221,7 @@ tr:hover td {
     <div id="stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px"></div>
   </div>
   <div class="card">
-  <table>
+    <table>
       <thead>
         <tr>
           <th>รูป</th><th>ชื่อสินค้า</th><th>แคปชั่น</th><th>ยี่ห้อ</th><th>เลขบิล</th><th>สาขา</th><th>ประเภท</th>
@@ -1221,11 +1229,10 @@ tr:hover td {
         </tr>
       </thead>
       <tbody id="productTable"></tbody>
-
-<div id="imageViewer" class="image-viewer" onclick="this.style.display='none'">
-  <img id="imageViewerImg" />
-</div>
     </table>
+  </div>
+  <div id="imageViewer" class="image-viewer" onclick="this.style.display='none'">
+    <img id="imageViewerImg" />
   </div>
 </div>
 
@@ -2002,6 +2009,39 @@ loginBtn.onclick = async () => {
           border-bottom: 1px solid #f3f4f6;
           text-align: left;
           vertical-align: top;
+        }
+
+        /* Stock/Products table */
+        #stockSection table th,
+        #stockSection table td {
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
+          max-width: none;
+        }
+
+        #stockSection table td:nth-child(3) {
+          max-width: 150px;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+
+        #stockSection .action-col {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          align-items: stretch;
+          min-width: 120px;
+        }
+
+        #stockSection .action-col .btn {
+          font-size: 11px;
+          padding: 6px 8px;
+        }
+
+        /* Orders table */
+        #orderTable th,
+        #orderTable td {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -2024,21 +2064,6 @@ loginBtn.onclick = async () => {
         tr:hover td {
           background: #f9fafb;
         }
-
-        /* Column width constraints */
-        td:nth-child(1), th:nth-child(1) { max-width:80px; }
-        td:nth-child(2), th:nth-child(2) { max-width:85px; }
-        td:nth-child(3), th:nth-child(3) { max-width:90px; }
-        td:nth-child(4), th:nth-child(4) { max-width:95px; }
-        td:nth-child(5), th:nth-child(5) { max-width:65px; }
-        td:nth-child(6), th:nth-child(6) { max-width:60px; }
-        td:nth-child(7), th:nth-child(7) { max-width:65px; }
-        td:nth-child(8), th:nth-child(8) { max-width:70px; }
-        td:nth-child(9), th:nth-child(9) { max-width:70px; }
-        td:nth-child(10), th:nth-child(10) { max-width:65px; }
-        td:nth-child(11), th:nth-child(11) { max-width:80px; }
-        td:nth-child(12), th:nth-child(12) { max-width:95px; }
-        td:nth-child(13), th:nth-child(13) { max-width:70px; }
         
         /* Status Tags */
         .status {
