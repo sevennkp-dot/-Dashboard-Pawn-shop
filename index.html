@@ -55,6 +55,8 @@ iframe{width:100%;height:calc(100vh - 80px);border:none;border-radius:16px;backg
 <div id="salesSection" class="section">
   
 
+ 
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -147,7 +149,7 @@ tr:hover td{background:#f9fafb}
       <div class="tab active" id="tabStore">🛒 ขายหน้าร้าน</div>
       <div class="tab" id="tabOnline">🌐 ขายออนไลน์</div>
     </div>
-    <input id="searchSalesInput" class="search" placeholder="🔍 ค้นหา">
+    <input id="jedSearchSalesInput" class="search" placeholder="🔍 ค้นหา">
   </div>
 
   
@@ -191,6 +193,7 @@ const tbody = document.getElementById('tbody');
 const tabStore = document.getElementById('tabStore');
 let currentRows = [];
 const tabOnline = document.getElementById('tabOnline');
+const jedSearchSalesInput = document.getElementById('jedSearchSalesInput');
 
 // ================= Utils =================
 async function viewProduct(productId){
@@ -312,9 +315,8 @@ function renderRows(rows){
 }
 
 // ================= Search =================
-const searchSalesInput = document.getElementById('searchSalesInput');
-searchSalesInput.oninput = () => {
-  const q = searchSalesInput.value.toLowerCase();
+jedSearchSalesInput.oninput = () => {
+  const q = jedSearchSalesInput.value.toLowerCase();
   renderRows(currentRows.filter(r =>
     Object.values(r).some(v => String(v||'').toLowerCase().includes(q))
   ));
@@ -376,6 +378,7 @@ async function loadOnlineSales(){
 
   thead.innerHTML = `
     <tr>
+      <th>รูป</th>
       <th>สินค้า</th>
       <th>ลูกค้า</th>
       <th>เบอร์</th>
@@ -428,6 +431,12 @@ function renderOnlineRows(rows){
 
     return `
       <tr>
+        <td>
+          <img src="${imgSrc}" 
+               style="width:48px;height:48px;object-fit:cover;border-radius:8px;cursor:zoom-in"
+               onclick="viewProduct('${r.product_id}')"
+               onerror="this.src='https://via.placeholder.com/48'">
+        </td>
         <td>${r.product_name||'-'}</td>
         <td>${r.customer_name||'-'}</td>
         <td>${r.customer_phone||'-'}</td>
@@ -498,7 +507,7 @@ loadStoreSales();
   
 <!-- ===== Sections ===== -->
 <div id="stockSection" class="section active">  
-  <!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
@@ -894,11 +903,42 @@ pm_save.onclick = async () => {
   };
 
   if (isCreateMode) {
-    await supabase.from('products').insert(payload);
+    const { data, error } = await supabase
+      .from('products')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      alert('❌ เพิ่มสินค้าไม่สำเร็จ');
+      console.error(error);
+      return;
+    }
+
+    // เพิ่มสินค้าใหม่เข้า list ทันที (ไม่ต้องรีเฟรช)
+    allProducts.unshift(data);
+    renderProducts(allProducts);
+
   } else {
-    await supabase.from('products')
+    const { data, error } = await supabase
+      .from('products')
       .update(payload)
-      .eq('id', editingProduct.id);
+      .eq('id', editingProduct.id)
+      .select()
+      .single();
+
+    if (error) {
+      alert('❌ แก้ไขสินค้าไม่สำเร็จ');
+      console.error(error);
+      return;
+    }
+
+    // อัปเดตข้อมูลใน list ทันที
+    const idx = allProducts.findIndex(p => p.id === editingProduct.id);
+    if (idx !== -1) {
+      allProducts[idx] = data;
+      renderProducts(allProducts);
+    }
   }
 
   tempImages = [];
@@ -1067,6 +1107,9 @@ loadProducts();
 </script>
 </body>
 </html>
+
+
+
 
 
 
